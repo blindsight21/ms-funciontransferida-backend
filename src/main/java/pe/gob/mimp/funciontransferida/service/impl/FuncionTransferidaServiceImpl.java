@@ -5,6 +5,7 @@
  */
 package pe.gob.mimp.funciontransferida.service.impl;
 
+import com.google.gson.Gson;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
@@ -18,9 +19,10 @@ import pe.gob.mimp.siscap.repository.funciontransferida.FuncionTransRepository;
 import pe.gob.mimp.funciontransferida.bean.FindByParamBean;
 import pe.gob.mimp.funciontransferida.bean.FuncionTransferidaBean;
 import pe.gob.mimp.funciontransferida.converter.FuncionTransferidaCast;
-import pe.gob.mimp.funciontransferida.converter.TipoFuncionCast;
 import pe.gob.mimp.funciontransferida.util.Util;
 import pe.gob.mimp.funciontransferida.service.FuncionTransferidaService;
+import pe.gob.mimp.siscap.model.ActividadGob;
+import pe.gob.mimp.siscap.model.TipoFuncion;
 
 /**
  *
@@ -72,6 +74,14 @@ public class FuncionTransferidaServiceImpl implements FuncionTransferidaService 
             findByParamBean.setParameters(new HashMap<>());
         }
 
+        findByParamBean.getParameters().forEach((k, v) -> {
+            if ("nidTipoFuncion".equals(k)) {
+                String jsonString = new Gson().toJson(v);
+                TipoFuncion tipoFuncion = new Gson().fromJson(jsonString, TipoFuncion.class);
+                findByParamBean.getParameters().put(k, tipoFuncion);
+            }
+        });
+        
         List<FuncionTransferida> funcionTransferidaList = funcionTransferidaRepository.findByParams(findByParamBean.getParameters(), findByParamBean.getOrderBy());
 
         if (!Util.esListaVacia(funcionTransferidaList)) {
